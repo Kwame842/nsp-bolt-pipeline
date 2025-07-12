@@ -44,3 +44,8 @@ end_datasource = glueContext.create_dynamic_frame.from_options(
         "dynamodb.filter": "begins_with(sk, 'RAW#end#')"
     }
 )
+
+
+# Convert to DataFrames
+start_df = start_datasource.toDF()
+end_df = end_datasource.toDF()
