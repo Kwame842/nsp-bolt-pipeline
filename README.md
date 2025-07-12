@@ -60,11 +60,12 @@ nsp-bolt-trip-pipeline/
 ├── diagram/                   # Architecture Diagram
 │   └── Architecture7.png                # Architecture Diagram Image
 ├── lambdas/                         # Lambda functions
-│   ├── trip_start_processor.py
-│   ├── trip_end_processor.py
-│   └── trip_merger.py
-├── glue/                            # Glue ETL jobs
+│   ├── TripStartProcessor.py
+│   ├── TripEndProcessor.py
+├── glue_jobs/                            # Glue ETL jobs
 │   └── KPI-Aggregator.py
+├── imgs/                            # Glue ETL jobs
+│   └── screenshots.png
 ├── simulator/                       # Simulator to push events
 │   └── simulator.py
 ├── tests/                           # Optional test suite
