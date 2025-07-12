@@ -1,0 +1,68 @@
+{
+    "Comment": "Trigger Glue Job and send SNS notifications for success or failure",
+    "StartAt": "StartGlueKPIAggregation",
+    "States": {
+      "StartGlueKPIAggregation": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::glue:startJobRun.sync",
+        "Parameters": {
+          "JobName": "KPI-Aggregator-New"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Glue.JobRunTimeout",
+              "Glue.ConcurrentRunsExceededException"
+            ],
+            "IntervalSeconds": 60,
+            "MaxAttempts": 3,
+            "BackoffRate": 2
+          },
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "IntervalSeconds": 30,
+            "MaxAttempts": 1
+          }
+        ],
+        "Catch": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "Next": "NotifyFailure"
+          }
+        ],
+        "Next": "NotifySuccess"
+      },
+      "NotifySuccess": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::sns:publish",
+        "Parameters": {
+          "TopicArn": "arn:aws:sns:eu-north-1:714377355835:NSP-Ride-Success",
+          "Message": "✅ Glue job 'daily_kpi_aggregator' completed successfully.",
+          "Subject": "NSP KPI Aggregation Success"
+        },
+        "Next": "SuccessState"
+      },
+      "NotifyFailure": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::sns:publish",
+        "Parameters": {
+          "TopicArn": "arn:aws:sns:eu-north-1:714377355835:NSP-Ride-Failure",
+          "Message": "❌ Glue job 'daily_kpi_aggregator' failed. Check CloudWatch Logs for details.",
+          "Subject": "NSP KPI Aggregation Failure"
+        },
+        "Next": "FailureState"
+      },
+      "SuccessState": {
+        "Type": "Succeed"
+      },
+      "FailureState": {
+        "Type": "Fail",
+        "Error": "GlueJobFailure",
+        "Cause": "The Glue job failed and notification was sent."
+      }
+    }
+  }
