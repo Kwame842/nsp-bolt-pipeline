@@ -58,13 +58,12 @@ jobs:
       - name: Install TripStartProcessor dependencies
         working-directory: lambdas/TripStartProcessor
         run: |
-         pip install -r requirements.txt -t .
+          pip install -r requirements.txt -t .
 
       - name: Install TripEndProcessor dependencies
         working-directory: lambdas/TripEndProcessor
         run: |
-         pip install -r requirements.txt -t .
-
+          pip install -r requirements.txt -t .
 
       - name: Build Lambda ZIPs
         run: |
@@ -96,13 +95,12 @@ jobs:
           aws stepfunctions create-state-machine \
             --name KPIOrchestrator \
             --definition file://stepfunction/stepfn.json \
-            --role-arn arn:aws:iam::714377355835:role/StepFunctionsEventBridgeRole \
+            --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/StepFunctionsEventBridgeRole \
             --region us-east-1 \
             --no-cli-pager || aws stepfunctions update-state-machine \
               --state-machine-arn arn:aws:states:us-east-1:${{ secrets.AWS_ACCOUNT_ID }}:stateMachine:KPIOrchestrator \
               --definition file://stepfunction/stepfn.json \
-              --role-arn arn:aws:iam::714377355835:role/StepFunctionsEventBridgeRole
-        
+              --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/StepFunctionsEventBridgeRole
 
       - name: Configure CloudWatch Events Rule
         run: |
@@ -110,13 +108,11 @@ jobs:
             --name DailyKPIOrchestration \
             --schedule-expression "cron(0 0 * * ? *)" \
             --region us-east-1 \
-            --no-cli-pager || aws events put-rule \
-              --name DailyKPIOrchestration \
-              --schedule-expression "cron(0 0 * * ? *)" \
-              --region us-east-1
+            --no-cli-pager || true
+
           aws events put-targets \
             --rule DailyKPIOrchestration \
-            --targets "Id=1,Arn=arn:aws:states:us-east-1:${{ secrets.AWS_ACCOUNT_ID }}:stateMachine:KPIOrchestrator" \
+            --targets "Id=1,Arn=arn:aws:states:us-east-1:${{ secrets.AWS_ACCOUNT_ID }}:stateMachine:KPIOrchestrator,RoleArn=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/StepFunctionsEventBridgeRole" \
             --region us-east-1
 
       - name: Upload Glue script to S3
