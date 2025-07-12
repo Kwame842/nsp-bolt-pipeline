@@ -12,3 +12,7 @@ from pyspark.sql.functions import (
     sum as _sum, avg as _avg  # Aliased to avoid name conflict with built-ins
 )
 import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
