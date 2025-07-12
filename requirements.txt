@@ -1,0 +1,5 @@
+boto3
+botocore
+jsonschema
+pytest
+moto[dynamodb2]  # For testing DynamoDB locally
