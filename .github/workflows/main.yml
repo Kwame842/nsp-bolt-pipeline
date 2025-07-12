@@ -55,12 +55,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Install dependencies for Lambda
+      - name: Install TripStartProcessor dependencies
+        working-directory: lambdas/TripStartProcessor
         run: |
-          cd lambdas/TripStartProcessor
-          pip install -r requirements.txt -t .
-          cd ../TripEndProcessor
-          pip install -r requirements.txt -t .
+         pip install -r requirements.txt -t .
+
+      - name: Install TripEndProcessor dependencies
+        working-directory: lambdas/TripEndProcessor
+        run: |
+         pip install -r requirements.txt -t .
+
 
       - name: Build Lambda ZIPs
         run: |
