@@ -96,3 +96,31 @@ end_columns = {
 # Apply column selection
 start_df = start_df.select(*start_columns.values())
 end_df = end_df.select(*end_columns.values())
+
+# Join on trip_id
+joined_df = start_df.join(end_df, on="trip_id", how="inner")
+
+# Extract date for partitioning
+joined_df = joined_df.withColumn("date", to_date(col("dropoff_datetime")))
+
+# Aggregate KPIs
+kpi_df = joined_df.groupBy("date").agg(
+    countDistinct("trip_id").alias("total_trips"),
+    _sum("fare_amount").alias("total_fare_usd"),
+    countDistinct(when(col("vendor_id").isNotNull(), col("vendor_id"))).alias("unique_vendors"),
+    _sum("trip_distance").alias("total_distance_km"),
+    _avg("passenger_count").alias("avg_passenger_count")
+).na.fill(0)
+
+# Write to S3
+glueContext.write_dynamic_frame.from_options(
+    frame=DynamicFrame.fromDF(kpi_df.coalesce(1), glueContext, "kpi_df"),
+    connection_type="s3",
+    connection_options={
+        "path": "s3://nsp-kpi-results-bucket/kpi/",
+        "partitionKeys": ["date"]
+    },
+    format="json"
+)
+
+job.commit()
