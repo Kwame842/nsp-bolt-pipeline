@@ -102,6 +102,7 @@ jobs:
               --state-machine-arn arn:aws:states:us-east-1:${{ secrets.AWS_ACCOUNT_ID }}:stateMachine:KPIOrchestrator \
               --definition file://stepfunction/stepfn.json \
               --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/StepFunctionsExecutionRole
+        
 
       - name: Configure CloudWatch Events Rule
         run: |
