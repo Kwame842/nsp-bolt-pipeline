@@ -24,3 +24,13 @@ glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
+
+# Read RAW#start# records
+start_datasource = glueContext.create_dynamic_frame.from_options(
+    connection_type="dynamodb",
+    connection_options={
+        "dynamodb.input.tableName": "TripData",
+        "dynamodb.throughput.read.percent": "1.0",
+        "dynamodb.filter": "begins_with(sk, 'RAW#start#')"
+    }
+)
