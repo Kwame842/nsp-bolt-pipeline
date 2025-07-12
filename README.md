@@ -60,9 +60,13 @@ nsp-bolt-trip-pipeline/
 │       └── main.yml
 ├── diagram/                    # Architecture Diagram
 │   └── Architecture7.png
-├── lambdas/                    # Lambda functions
+├── lambdas/ 
+│   └── TripStartProcessor/                    # Lambda functions
 │   ├── TripStartProcessor.py
+│   ├── Requirements.txt
+│   └── TripEndProcessor/
 │   ├── TripEndProcessor.py
+│   ├── Requirements.txt
 ├── glue_jobs/                  # Glue ETL jobs
 │   └── KPI-Aggregator.py
 ├── step_functions/             # Step Functions state machine
