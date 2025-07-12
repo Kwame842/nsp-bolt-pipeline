@@ -1,6 +1,6 @@
 # NSP Bolt Ride – Real-Time Trip Processing Pipeline
 
-This project implements a scalable, serverless, and event-driven data processing pipeline for real-time tracking and analysis of ride-hailing trip events. Built on AWS, it processes trip start and end events, validates and deduplicates data, detects trip completions, and computes daily KPIs such as total fares, average fare, and trip count. Results are stored in S3 for downstream analytics. The system emphasizes reliability, modularity, cloud-native scalability, and fault tolerance using AWS services like Kinesis, Lambda, DynamoDB, Glue, S3, SQS, and CloudWatch.
+This project implements a scalable, serverless, and event-driven data processing pipeline for real-time tracking and analysis of ride-hailing trip events. Built on AWS, it processes trip start and end events, validates and deduplicates data, detects trip completions, and computes daily KPIs such as total fares, average fare, and trip count. Results are stored in S3 for downstream analytics. The system emphasizes reliability, modularity, cloud-native scalability, and fault tolerance using AWS services like Kinesis, Lambda, DynamoDB, Glue, S3 and CloudWatch.
 
 ---
 
