@@ -63,3 +63,36 @@ end_df = end_df.withColumn(
     "dropoff_datetime",
     to_date(unix_timestamp(col("dropoff_datetime"), "dd/MM/yyyy HH:mm").cast("timestamp"))
 )
+
+
+# Define selected columns with fallback
+start_columns = {
+    "trip_id": col("trip_id"),
+    "start_sk": col("sk").alias("start_sk"),
+    "pickup_datetime": col("pickup_datetime"),
+    "pickup_location_id": col("pickup_location_id").cast("int").alias("pickup_location_id"),
+    "estimated_dropoff_datetime": col("estimated_dropoff_datetime") if "estimated_dropoff_datetime" in start_df.columns else lit(None).alias("estimated_dropoff_datetime"),
+    "estimated_fare_amount": col("estimated_fare_amount").cast("double").alias("estimated_fare_amount"),
+    "vendor_id": col("vendor_id").cast("int").alias("vendor_id")
+}
+
+end_columns = {
+    "trip_id": col("trip_id"),
+    "end_sk": col("sk").alias("end_sk"),
+    "dropoff_datetime": col("dropoff_datetime"),
+    "fare_amount": col("fare_amount").cast("double").alias("fare_amount"),
+    "trip_distance": coalesce(
+        col("trip_distance").getField("double"),
+        col("trip_distance").getField("long")
+    ).cast("double").alias("trip_distance"),
+    "passenger_count": col("passenger_count").cast("int").alias("passenger_count"),
+    "payment_type": col("payment_type").cast("int").alias("payment_type") if "payment_type" in end_df.columns else lit(None).alias("payment_type"),
+    "tip_amount": coalesce(
+        col("tip_amount").getField("double"),
+        col("tip_amount").getField("long")
+    ).cast("double").alias("tip_amount") if "tip_amount" in end_df.columns else lit(0.0).alias("tip_amount")
+}
+
+# Apply column selection
+start_df = start_df.select(*start_columns.values())
+end_df = end_df.select(*end_columns.values())
