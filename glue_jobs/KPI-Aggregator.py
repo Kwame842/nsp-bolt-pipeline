@@ -49,3 +49,17 @@ end_datasource = glueContext.create_dynamic_frame.from_options(
 # Convert to DataFrames
 start_df = start_datasource.toDF()
 end_df = end_datasource.toDF()
+
+# Log available columns
+logger.info(f"Start DataFrame columns: {start_df.columns}")
+logger.info(f"End DataFrame columns: {end_df.columns}")
+
+# Parse date strings to timestamp format
+start_df = start_df.withColumn(
+    "pickup_datetime",
+    to_date(unix_timestamp(col("pickup_datetime"), "dd/MM/yyyy HH:mm").cast("timestamp"))
+)
+end_df = end_df.withColumn(
+    "dropoff_datetime",
+    to_date(unix_timestamp(col("dropoff_datetime"), "dd/MM/yyyy HH:mm").cast("timestamp"))
+)
