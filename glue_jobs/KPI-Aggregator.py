@@ -34,3 +34,13 @@ start_datasource = glueContext.create_dynamic_frame.from_options(
         "dynamodb.filter": "begins_with(sk, 'RAW#start#')"
     }
 )
+
+# Read RAW#end# records
+end_datasource = glueContext.create_dynamic_frame.from_options(
+    connection_type="dynamodb",
+    connection_options={
+        "dynamodb.input.tableName": "TripData",
+        "dynamodb.throughput.read.percent": "1.0",
+        "dynamodb.filter": "begins_with(sk, 'RAW#end#')"
+    }
+)
