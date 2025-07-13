@@ -1,15 +1,13 @@
-
-
 import sys
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
-from awsglue.dynamicframe import DynamicFrame
 from awsglue.context import GlueContext
 from awsglue.job import Job
+from awsglue.dynamicframe import DynamicFrame
 from pyspark.sql.functions import (
-    col, to_date, countDistinct, lit, unix_timestamp, when, coalesce,
-    sum as _sum, avg as _avg  # Aliased to avoid name conflict with built-ins
+    col, to_date, count, lit, unix_timestamp, when, coalesce,
+    sum as _sum, avg as _avg, max as _max, min as _min
 )
 import logging
 
@@ -45,7 +43,6 @@ end_datasource = glueContext.create_dynamic_frame.from_options(
     }
 )
 
-
 # Convert to DataFrames
 start_df = start_datasource.toDF()
 end_df = end_datasource.toDF()
@@ -63,7 +60,6 @@ end_df = end_df.withColumn(
     "dropoff_datetime",
     to_date(unix_timestamp(col("dropoff_datetime"), "dd/MM/yyyy HH:mm").cast("timestamp"))
 )
-
 
 # Define selected columns with fallback
 start_columns = {
@@ -100,19 +96,23 @@ end_df = end_df.select(*end_columns.values())
 # Join on trip_id
 joined_df = start_df.join(end_df, on="trip_id", how="inner")
 
-# Extract date for partitioning
+# Extract date for daily aggregation
 joined_df = joined_df.withColumn("date", to_date(col("dropoff_datetime")))
 
-# Aggregate KPIs
+# Calculate minimum required KPIs
 kpi_df = joined_df.groupBy("date").agg(
-    countDistinct("trip_id").alias("total_trips"),
-    _sum("fare_amount").alias("total_fare_usd"),
-    countDistinct(when(col("vendor_id").isNotNull(), col("vendor_id"))).alias("unique_vendors"),
-    _sum("trip_distance").alias("total_distance_km"),
-    _avg("passenger_count").alias("avg_passenger_count")
+    _sum("fare_amount").alias("total_fare"),
+    count("trip_id").alias("count_trips"),
+    _avg("fare_amount").alias("average_fare"),
+    _max("fare_amount").alias("max_fare"),
+    _min("fare_amount").alias("min_fare")
 ).na.fill(0)
 
-# Write to S3
+# Log sample output for verification
+kpi_sample = kpi_df.limit(5).collect()
+logger.info(f"KPI Sample Output:\n{kpi_sample}")
+
+# Write to S3 as JSON partitioned by date
 glueContext.write_dynamic_frame.from_options(
     frame=DynamicFrame.fromDF(kpi_df.coalesce(1), glueContext, "kpi_df"),
     connection_type="s3",
