@@ -310,6 +310,7 @@ The Glue job generates daily KPI results in S3 as timestamped JSON files. Exampl
 ```
 
 ![Output](imgs/NSP-Ride-KPIs.png)
+![Output](imgs/NSP-Ride-KPIs-New.png)
 
 - **Location**: `s3://nsp-kpi-results-bucket/kpi-results/YYYY/MM/DD/kpi.json`
 - **Usage**: Suitable for integration with dashboards (e.g., Amazon QuickSight) or further analytics.
