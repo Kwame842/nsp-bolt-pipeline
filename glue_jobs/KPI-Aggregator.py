@@ -1,3 +1,4 @@
+# Import the necessary packages for the KPI Aggregator script
 import sys
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
