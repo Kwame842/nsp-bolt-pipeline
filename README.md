@@ -4,7 +4,7 @@ The NSP Bolt Ride project is a scalable, serverless, and event-driven data proce
 
 This README provides a comprehensive guide to the project’s architecture, setup, deployment, and maintenance, catering to data engineers, DevOps professionals, and stakeholders interested in real-time data processing for ride-hailing applications.
 
-![Architecture](diagram/Architecture7.png)
+![Architecture](diagram/Architecture7.svg)
 
 ---
 
